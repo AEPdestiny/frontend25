@@ -1,5 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import SucheView from '@/views/SucheView.vue'
+import LoginView from '@/views/LoginView.vue'
+import KleidungListe from '@/components/KleidungListe.vue'
+import AboutView from '@/views/AboutView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,17 +11,36 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: HomeView
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: LoginView
+    },
+    {
+      path: '/suche',
+      name: 'Suche',
+      component: SucheView
+    },
+    {
+      path: '/kleidung',
+      name: 'Kleidung',
+      component: KleidungListe
     },
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
-    },
-  ],
+      component: AboutView
+    }
+  ]
 })
-
+// class Kleidung{
+//   constructor(private kleidungName: string, private groesse: string, private lager: number) {
+//   }
+// }
+// class KleidungController{
+//   constructor(private kleidungName: string, private groesse: string, private lager: number) {
+//   }
+// }
 export default router
