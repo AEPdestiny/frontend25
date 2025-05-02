@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-const kleidung = ref([])
+const kleidung = ref<{ id: number; [key: string]: unknown }[]>([])
 
 onMounted(() => {
   fetch("/api/kleidung")
@@ -15,8 +15,8 @@ onMounted(() => {
   <div>
     <h2>Inventar</h2>
     <ul>
-      <li v-for="k in kleidung" :key="k.id">
-        {{ k.name }} (Lager: {{ k.lager }})
+      <li v-for="item in kleidung" :key="item.id">
+        {{ item.name }} (Größe: {{ item.groesse }}, Lager: {{ item.lager }})
       </li>
     </ul>
   </div>
