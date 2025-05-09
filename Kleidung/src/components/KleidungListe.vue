@@ -3,8 +3,9 @@ import { ref, onMounted } from 'vue'
 
 const kleidung = ref<{ id: number; [key: string]: unknown }[]>([])
 
+
 onMounted(() => {
-  fetch("/api/kleidung")
+  fetch("http://localhost:8080/api/kleidung")
     .then(r => r.json())
     .then(d => (kleidung.value = d))
     .catch(e => console.error("Fehler beim Laden der Kleidung:", e))
