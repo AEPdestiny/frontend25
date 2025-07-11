@@ -1,6 +1,6 @@
 // src/stores/authStore.ts
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios, { type AxiosError } from 'axios'
 
@@ -14,19 +14,22 @@ interface User {
 interface AuthStore {
   user: Ref<User | null>
   error: Ref<string | null>
+  success: Ref<string | null>
   isLoading: Ref<boolean>
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  clearMessages: () => void
 }
 
 export const useAuthStore = defineStore('auth', (): AuthStore => {
   const router = useRouter()
   const user = ref<User | null>(null)
   const error = ref<string | null>(null)
+  const success = ref<string | null>(null) // ✨ NEU
   const isLoading = ref(false)
 
   const login = async (email: string, password: string) => {
-    // Ihre bestehende Login-Logik
+    // Login - Logik
   }
 
   const logout = async () => {
@@ -44,11 +47,18 @@ export const useAuthStore = defineStore('auth', (): AuthStore => {
     }
   }
 
+  const clearMessages = () => {
+    error.value = null
+    success.value = null
+  }
+
   return {
     user,
     error,
+    success,
     isLoading,
     login,
-    logout
+    logout,
+    clearMessages
   }
 })
