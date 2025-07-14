@@ -1,14 +1,42 @@
 <script setup lang="ts">
+import { reactive, onMounted } from 'vue'
+import axios from 'axios'
 
+interface Artikel {
+  id: number
+  bezeichnung: string
+  groesse: string
+  lagerbestand: number
+}
+
+interface Statistik {
+  gesamtLagerbestand: number
+  niedrigerLagerbestand: Artikel[]
+  ausverkaufteArtikel: number
+  alleArtikel: Artikel[]
+}
+
+const benutzer = JSON.parse(localStorage.getItem('user') ?? '{}')
+
+const statistik = reactive<Statistik>({
+  gesamtLagerbestand: 0,
+  niedrigerLagerbestand: [] as Artikel[],
+  ausverkaufteArtikel: 0,
+  alleArtikel: [] as Artikel[]
+})
+
+const ladeStatistik = async () => {
+  try {
+    const { data } = await axios.get<Statistik>('/dashboard')
+    Object.assign(statistik, data)          // Daten ins Reactive-Objekt kopieren
+  } catch (err) {
+    console.error('Fehler beim Laden:', err)
+  }
+}
+
+onMounted(ladeStatistik)
 </script>
 
-<template>
-
-</template>
-
-<style scoped>
-
-</style>
 <template>
   <div>
     <h1 class="mb-4">Willkommen, {{ benutzer.vorname }}!</h1>
@@ -97,34 +125,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import axios from 'axios'
-
-export default {
-  data() {
-    return {
-      benutzer: JSON.parse(localStorage.getItem('user')),
-      statistik: {
-        gesamtLagerbestand: 0,
-        niedrigerLagerbestand: [],
-        ausverkaufteArtikel: 0,
-        alleArtikel: []
-      }
-    }
-  },
-  async created() {
-    await this.ladeStatistik()
-  },
-  methods: {
-    async ladeStatistik() {
-      try {
-        const response = await axios.get('/dashboard')
-        this.statistik = response.data
-      } catch (error) {
-        console.error('Fehler beim Laden der Statistik:', error)
-      }
-    }
-  }
-}
-</script>
