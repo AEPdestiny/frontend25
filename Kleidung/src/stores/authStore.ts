@@ -29,27 +29,36 @@ export const useAuthStore = defineStore('auth', (): AuthStore => {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      isLoading.value = true
-      error.value = null
+      isLoading.value = true;
+      error.value = null;
 
-      await axios.post('/auth/anmelden',
-        new URLSearchParams({ email, passwort: password }), {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        })
+      // 1. Login-Request (URL-encoded)
+      const params = new URLSearchParams();
+      params.append('email', email);
+      params.append('passwort', password);
 
-      const userResponse = await axios.get('/auth/current-user')
-      user.value = userResponse.data
-      localStorage.setItem('user', JSON.stringify(user.value))
-      success.value = 'Anmeldung erfolgreich'
-      return true
+      const loginResponse = await axios.post('/api/auth/anmelden', params, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        withCredentials: true // WICHTIG für Session-Cookies
+      });
+
+      // 2. Bei Erfolg: Benutzerdaten abrufen
+      if (loginResponse.data.success) {
+        const userResponse = await axios.get('/auth/current-user', {
+          withCredentials: true
+        });
+        user.value = userResponse.data;
+        localStorage.setItem('user', JSON.stringify(user.value));
+        return true;
+      }
+      return false;
     } catch (err) {
-      const axiosError = err as AxiosError<{ fehler?: string }>
-      error.value = axiosError.response?.data?.fehler || 'Anmeldung fehlgeschlagen'
-      return false
+      error.value = "Anmeldung fehlgeschlagen";
+      return false;
     } finally {
-      isLoading.value = false
+      isLoading.value = false;
     }
-  }
+  };
 
   const logout = async (): Promise<void> => {
     try {
