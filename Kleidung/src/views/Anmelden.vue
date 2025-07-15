@@ -60,14 +60,23 @@
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
-const { error, isLoading } = storeToRefs(authStore)
+const router = useRouter()
+const { isLoading } = storeToRefs(authStore)
 const email = ref<string>('')
 const passwort = ref<string>('')
 
 const handleLogin = async (): Promise<void> => {
-  await authStore.login(email.value, passwort.value)
+  try {
+    const success = await authStore.login(email.value, passwort.value)
+    if (success) {
+      await router.push('/dashboard')
+    }
+  } catch (err) {
+    console.error('Login error:', err)
+  }
 }
 </script>
 
