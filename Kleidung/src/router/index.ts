@@ -65,7 +65,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const benutzer = JSON.parse(localStorage.getItem('benutzer') || 'null')
+  const benutzer = JSON.parse(localStorage.getItem('user') || 'null')
   const istAngemeldet = benutzer !== null
 
   if (to.meta.requiresAuth && !istAngemeldet) {
