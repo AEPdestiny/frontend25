@@ -32,28 +32,35 @@ export const useAuthStore = defineStore('auth', (): AuthStore => {
       isLoading.value = true;
       error.value = null;
 
-      // 1. Login-Request (URL-encoded)
       const params = new URLSearchParams();
       params.append('email', email);
       params.append('passwort', password);
 
+      // 1. Login-Request
       const loginResponse = await axios.post('/api/auth/anmelden', params, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        withCredentials: true // WICHTIG für Session-Cookies
+        withCredentials: true
       });
 
-      // 2. Bei Erfolg: Benutzerdaten abrufen
+      // 2. Erfolgsfall
       if (loginResponse.data.success) {
-        const userResponse = await axios.get('/auth/current-user', {
-          withCredentials: true
-        });
-        user.value = userResponse.data;
+        // Direkt die Daten aus der Login-Response verwenden (kein extra /current-user Call nötig!)
+        user.value = loginResponse.data.user; // Anpassung an Ihr Backend-Response
         localStorage.setItem('user', JSON.stringify(user.value));
+
+        // Manuelle Weiterleitung, da kein Redirect mehr vom Backend kommt
+        router.push('/dashboard');
         return true;
       }
+
+      // 3. Fehlerfall (Backend antwortet mit success=false)
+      error.value = loginResponse.data.error || "Anmeldung fehlgeschlagen";
       return false;
+
     } catch (err) {
-      error.value = "Anmeldung fehlgeschlagen";
+      // 4. Netzwerk-/Serverfehler (z.B. 500)
+      error.value = "Serverfehler - bitte später erneut versuchen";
+      console.error("Login error:", err);
       return false;
     } finally {
       isLoading.value = false;
